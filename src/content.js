@@ -218,16 +218,29 @@
           lastSources = r.sources || [];
           out.textContent = lastText;
           status.textContent = 'via ' + r.provider;
+          sourcesEl.replaceChildren();
           if (lastSources.length) {
-            sourcesEl.innerHTML =
-              '<div class="aiw-src-title">Sources</div><ul>' +
-              lastSources
-                .map((s) => `<li><a href="${esc(s.uri)}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a></li>`)
-                .join('') +
-              '</ul>';
+            const title = document.createElement('div');
+            title.className = 'aiw-src-title';
+            title.textContent = 'Sources';
+            const ul = document.createElement('ul');
+            for (const s of lastSources) {
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.href = /^https?:\/\//i.test(s.uri || '') ? s.uri : '#'; // only allow http(s)
+              a.target = '_blank';
+              a.rel = 'noopener noreferrer';
+              a.textContent = s.title || s.uri || 'source';
+              li.appendChild(a);
+              ul.appendChild(li);
+            }
+            sourcesEl.append(title, ul);
           } else if (r.grounded === false) {
-            sourcesEl.innerHTML =
-              '<div class="aiw-src-note">No live sources — this provider has no web access. Switch to Gemini or OpenRouter for fact-check links.</div>';
+            const note = document.createElement('div');
+            note.className = 'aiw-src-note';
+            note.textContent =
+              'No live sources — this provider has no web access. Switch to Gemini or OpenRouter for fact-check links.';
+            sourcesEl.appendChild(note);
           }
         } else {
           out.textContent = '';

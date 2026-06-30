@@ -28,9 +28,19 @@ function renderForProvider() {
   $('model').value = state.models[id] || '';
   $('model').placeholder = p.model;
   $('keyField').style.display = p.keyless ? 'none' : '';
-  $('keyHint').innerHTML = p.keyless
-    ? 'No key needed for this provider. Quality is lower — good for trying it out.'
-    : (p.keyUrl ? `Get a free key: <a href="${p.keyUrl}" target="_blank" rel="noopener">${p.keyUrl}</a>` : '');
+  const hint = $('keyHint');
+  hint.replaceChildren();
+  if (p.keyless) {
+    hint.textContent = 'No key needed for this provider. Quality is lower — good for trying it out.';
+  } else if (p.keyUrl) {
+    hint.append('Get a free key: ');
+    const a = document.createElement('a');
+    a.href = p.keyUrl;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = p.keyUrl;
+    hint.appendChild(a);
+  }
 }
 
 async function load() {
