@@ -31,7 +31,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "linkedin-ai-wheel@shivaraj-arch",
+      "id": "ai-spark-for-linkedin@shivaraj-arch",
       "strict_min_version": "121.0",
       "data_collection_permissions": { "required": ["websiteContent"] }
     }
