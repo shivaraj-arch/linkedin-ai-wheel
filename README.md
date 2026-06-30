@@ -1,4 +1,4 @@
-# LinkedIn AI Wheel
+# AI Spark for LinkedIn
 
 A browser extension that adds a button to each LinkedIn post. Click it to get a
 plain-language explanation of the post and an optional fact-check with source

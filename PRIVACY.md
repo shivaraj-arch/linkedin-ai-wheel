@@ -1,4 +1,4 @@
-# Privacy Policy — LinkedIn AI Wheel
+# Privacy Policy — AI Spark for LinkedIn
 
 Last updated: 2026
 

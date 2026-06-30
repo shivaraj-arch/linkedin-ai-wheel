@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "LinkedIn AI Wheel",
+  "name": "AI Spark for LinkedIn",
   "version": "0.1.0",
   "description": "Adds a button to each LinkedIn post that explains and fact-checks it with sources, using your own AI provider key.",
   "permissions": ["storage"],
@@ -26,7 +26,7 @@
   "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
   "action": {
     "default_popup": "src/popup.html",
-    "default_title": "LinkedIn AI Wheel",
+    "default_title": "AI Spark for LinkedIn",
     "default_icon": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
   },
   "browser_specific_settings": {
