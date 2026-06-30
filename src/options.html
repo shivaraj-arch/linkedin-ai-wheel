@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkedIn AI Wheel — Settings</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <main>
+    <h1>LinkedIn AI Wheel</h1>
+    <p class="sub">Explains and fact-checks the post you're viewing, with sources. Your key is stored locally in this browser and only sent to the provider you choose.</p>
+
+    <label class="field">
+      <span>Provider</span>
+      <select id="provider"></select>
+    </label>
+
+    <p id="keyHint" class="hint"></p>
+
+    <label class="field" id="keyField">
+      <span>API key</span>
+      <input id="apiKey" type="password" placeholder="Paste your key" autocomplete="off" />
+    </label>
+
+    <label class="field">
+      <span>Model <small>(optional — leave blank for default)</small></span>
+      <input id="model" type="text" placeholder="" />
+    </label>
+
+    <label class="field">
+      <span>Default tone</span>
+      <select id="tone">
+        <option value="thoughtful">Thoughtful</option>
+        <option value="supportive">Supportive</option>
+        <option value="curious">Curious question</option>
+        <option value="professional">Professional</option>
+        <option value="witty">Lightly witty</option>
+      </select>
+    </label>
+
+    <label class="check">
+      <input id="enabled" type="checkbox" checked />
+      <span>Show the ✨ wheel on posts (reload LinkedIn after changing)</span>
+    </label>
+
+    <div class="actions">
+      <button id="save">Save</button>
+      <span id="status"></span>
+    </div>
+  </main>
+  <script src="options.js"></script>
+</body>
+</html>

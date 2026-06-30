@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "LinkedIn AI Wheel",
+  "version": "0.1.0",
+  "description": "Adds a button to each LinkedIn post that explains and fact-checks it with sources, using your own AI provider key.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "https://api.groq.com/*",
+    "https://openrouter.ai/*",
+    "https://api.openai.com/*",
+    "https://api.anthropic.com/*",
+    "https://text.pollinations.ai/*"
+  ],
+  "background": { "service_worker": "src/background.js" },
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/*"],
+      "js": ["src/content.js"],
+      "css": ["src/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_ui": { "page": "src/options.html", "open_in_tab": true },
+  "action": { "default_popup": "src/popup.html", "default_title": "LinkedIn AI Wheel" },
+  "browser_specific_settings": {
+    "gecko": { "id": "linkedin-ai-wheel@shivaraj-arch", "strict_min_version": "121.0" }
+  }
+}
