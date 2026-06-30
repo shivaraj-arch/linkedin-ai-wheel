@@ -13,7 +13,7 @@
     "https://api.anthropic.com/*",
     "https://text.pollinations.ai/*"
   ],
-  "background": { "service_worker": "src/background.js" },
+  "background": { "service_worker": "src/background.js", "scripts": ["src/background.js"] },
   "content_scripts": [
     {
       "matches": ["https://www.linkedin.com/*"],
@@ -30,6 +30,10 @@
     "default_icon": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
   },
   "browser_specific_settings": {
-    "gecko": { "id": "linkedin-ai-wheel@shivaraj-arch", "strict_min_version": "121.0" }
+    "gecko": {
+      "id": "linkedin-ai-wheel@shivaraj-arch",
+      "strict_min_version": "121.0",
+      "data_collection_permissions": { "required": ["websiteContent"] }
+    }
   }
 }
