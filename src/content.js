@@ -16,6 +16,21 @@
   const seen = new WeakSet();
   const log = (...a) => DEBUG && console.debug('[aiw]', ...a);
 
+  // Guardrail: scrub anything key/secret-shaped from the post text before it ever
+  // leaves the page (defense in depth — feed text shouldn't contain these anyway).
+  const redactSecrets = (s) =>
+    String(s || '')
+      .replace(/sk-[A-Za-z0-9_-]{20,}/g, '[redacted]') // OpenAI-style keys
+      .replace(/AIza[0-9A-Za-z_-]{20,}/g, '[redacted]') // Google API keys
+      .replace(/AKIA[0-9A-Z]{16}/g, '[redacted]') // AWS access key id
+      .replace(/\b(?:ghp|gho|github_pat)_[A-Za-z0-9_]{20,}/g, '[redacted]') // GitHub tokens
+      .replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g, '[redacted]') // JWT
+      .replace(/\b[A-Fa-f0-9]{40,}\b/g, '[redacted]'); // long hex secrets
+
+  // Skip non-post surfaces (notifications, nav, messaging, sidebars).
+  const inChrome = (el) =>
+    !!(el.closest && el.closest('.nt-card, [class*="notification"], .msg-overlay, .global-nav, nav, header, aside'));
+
   // --- find posts: try explicit markers, then derive from the stable Comment button ---
   function findPosts() {
     let posts = Array.from(document.querySelectorAll('[data-finite-scroll-hotkey-item]'));
@@ -33,7 +48,6 @@
       log('strategy: activity-urn ×', posts.length);
       return posts;
     }
-    // Fallback: derive the post container from each stable "Comment" button.
     const set = new Set();
     document.querySelectorAll('button[aria-label*="omment" i]').forEach((btn) => {
       const c =
@@ -44,14 +58,10 @@
     return Array.from(set);
   }
 
-  // Climb to the post container that actually holds the text (the node we matched
-  // may be a small nested element).
+  // Climb to the post container that actually holds the text.
   function richestRoot(node) {
-    // 1) known post-level wrappers, if present
     const anchor = node.closest && node.closest('[data-finite-scroll-hotkey-item], div.feed-shared-update-v2');
     if (anchor) return anchor;
-    // 2) class-agnostic: nearest ancestor that contains a Comment button AND real
-    // text — that is the whole post (works regardless of LinkedIn's class churn).
     let el = node;
     for (let i = 0; i < 14 && el.parentElement; i++) {
       el = el.parentElement;
@@ -59,7 +69,6 @@
       const len = (el.textContent || '').trim().length;
       if (hasComment && len > 80) return el;
     }
-    // 3) last resort
     return (node.closest && node.closest('[data-urn], [data-id], article, li')) || node;
   }
 
@@ -77,6 +86,8 @@
     'button',
   ].join(', ');
 
+  const MAX_TEXT = 1500; // max characters of post text we send, so long posts don't create oversized requests
+
   const getPostText = (post) => {
     const root = richestRoot(post);
     // 1) the post's commentary element (cleanest — excludes counts & our panel)
@@ -84,7 +95,7 @@
       const el = root.querySelector(sel);
       if (el && el.innerText.trim().length > 1) {
         log('text via selector', sel);
-        return el.innerText.trim().slice(0, 2000);
+        return el.innerText.trim().slice(0, MAX_TEXT);
       }
     }
     // 2) fallback: clone, strip noise (counts/buttons/our UI), read textContent
@@ -93,7 +104,7 @@
     clone.querySelectorAll(NOISE_SELECTORS).forEach((n) => n.remove());
     const text = (clone.textContent || '').replace(/\s+/g, ' ').trim();
     log('text via clone fallback — len', text.length, '| root', root.className || root.tagName);
-    return text.slice(0, 1500);
+    return text.slice(0, MAX_TEXT);
   };
 
   function makeWheel(post) {
@@ -116,8 +127,9 @@
   }
 
   function injectWheel(node) {
+    if (inChrome(node)) return; // skip notifications / nav / messaging / sidebars
     const root = richestRoot(node);
-    if (seen.has(root) || root.querySelector('.aiw-wheel')) {
+    if (inChrome(root) || seen.has(root) || root.querySelector('.aiw-wheel')) {
       seen.add(root);
       return;
     }
@@ -197,7 +209,7 @@
       status.textContent = 'analyzing…';
       out.textContent = 'Analyzing…';
       sourcesEl.innerHTML = '';
-      const text = getPostText(post);
+      const text = redactSecrets(getPostText(post));
       log('extracted text:', text.length, 'chars →', JSON.stringify(text.slice(0, 120)));
       try {
         const r = await api.runtime.sendMessage({ type: 'generate', text, mode: mode.value });
